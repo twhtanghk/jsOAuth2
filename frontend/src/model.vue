@@ -1,0 +1,33 @@
+<script lang='coffee'>
+Vue = require('vue').default
+Vue.use require('vue.model/src/plugin').default
+{eventBus} = require('./lib').default
+
+export default
+  User: new Vue
+    extends: Vue.component 'model'
+    props:
+      baseUrl:
+        default: 'api/user'
+      eventBus:
+        default: eventBus
+    methods:
+      format: (data) ->
+        data.createdAt = new Date data.createdAt
+        data.updatedAt = new Date data.updatedAt
+        data
+      me: ->
+        await @read data: id: 'me'
+      register: (email, password) ->
+        @post 
+          url: 'user/register'
+          data:
+            email: email
+            password: password
+      login: (email, password) ->
+        @post 
+          url: 'user/login'
+          data:
+            email: email
+            password: password
+</script>

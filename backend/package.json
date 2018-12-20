@@ -1,0 +1,44 @@
+{
+  "name": "oauth2",
+  "version": "0.0.1",
+  "description": "OAuth2 Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "mocha test/bootstrap.coffee test/unit/**/*.coffee"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/twhtanghk/jsOAuth2.git"
+  },
+  "keywords": [
+    "oauth2"
+  ],
+  "author": "twhtanghk@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/twhtanghk/jsOAuth2/issues"
+  },
+  "homepage": "https://github.com/twhtanghk/jsOAuth2#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.2.0",
+    "@babel/core": "^7.2.0",
+    "@babel/preset-env": "^7.2.0",
+    "@babel/register": "^7.0.0",
+    "bcrypt": "^3.0.2",
+    "bluebird": "^3.5.3",
+    "coffeescript": "^2.3.2",
+    "koa": "^2.6.2",
+    "koa-bodyparser": "^4.2.1",
+    "koa-logger": "^3.2.0",
+    "koa-methodoverride": "^2.0.0",
+    "koa-mongo": "^1.5.0",
+    "koa-router": "^7.4.0",
+    "koa-session": "^5.10.0",
+    "koa-static": "^5.0.0",
+    "mongodb-uri": "^0.9.7"
+  },
+  "dependencies": {
+    "mongodb": "^3.1.10"
+  }
+}
