@@ -1,0 +1,17 @@
+version: '2'
+services:
+  jsoauth2:
+    image: twhtanghk/jsoauth2
+    ports:
+      - 3000
+    env_file:
+      - ./.env
+      - ../.env
+
+  mongo:
+    image: mongo
+    ports:
+      - 27017
+    command: mongod --directoryperdb
+    env_file:
+      - ../.env
