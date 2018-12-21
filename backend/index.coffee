@@ -8,7 +8,7 @@ router = require './router'
 serve = require 'koa-static'
 
 app = new Koa()
-app.keys = ['abc']
+app.keys = cfg.session.keys
 module.exports = app
   .use logger()
   .use session {}, app
