@@ -1,18 +1,16 @@
 _ = require 'lodash'
+{collection} = require './model'
 {hashSync, genSaltSync} = require 'bcrypt'
+
 defaultValue = ->
   isActive: false
   createdAt: new Date()
 
-collection = (name) ->
-  db = await require('./model')()
-  db.collection name
 
 module.exports =
   register: (ctx) ->
     try
       {email, password} = ctx.request.body
-      debugger
       password = hashSync password, genSaltSync()
       data = _.defaults {email, password}, defaultValue()
       r = (await collection('user')).insertOneAsync data

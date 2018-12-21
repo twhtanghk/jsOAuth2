@@ -7,6 +7,10 @@ uri = mongoUri.parse cfg.model.url
 url = mongoUri.format _.omit uri, 'database'
 dbName = uri.database
 
-module.exports = ->
-  client = await MongoClient.connectAsync url
-  client.db dbName
+module.exports = 
+  db: ->
+    client = await MongoClient.connectAsync url
+    client.db dbName
+  collection: (name) ->
+    db = await module.exports.db()
+    db.collection name
