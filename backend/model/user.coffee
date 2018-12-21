@@ -1,9 +1,10 @@
+cfg = require '../config'
 db = require './db'
 _ = require 'lodash'
 {hashSync, genSaltSync} = require 'bcrypt'
 
 # ensure email uniqueness 
-db.get('user').ensureIndex {email: 1}, {unique: true}
+db.get('user').createIndex {email: 1}, {unique: true}
 
 # set default value for inserting user data
 db.addMiddleware (context) -> (next) -> (args, method) ->
@@ -12,6 +13,23 @@ db.addMiddleware (context) -> (next) -> (args, method) ->
       isActive: false
       createdAt: new Date()
   next args, method
+
+# send email notifcation after inserting user data
+db.addMiddleware (context) -> (next) -> (args, method) ->
+  next args, method
+    .then (res) ->
+      if context.collection.name == 'user' and method == 'insert'
+        {transporter} = require '../service/email'
+        transporter()
+          .sendMailAsync
+            from: cfg.email.from
+            to: res.email
+            subject: cfg.email.user.register.subject
+            html: _.template(cfg.email.user.register.html)(url: 'url')
+          .then ->
+            res
+      else
+        res
 
 module.exports =
   register: (ctx) ->
