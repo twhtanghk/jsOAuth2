@@ -1,20 +1,24 @@
+db = require './db'
 _ = require 'lodash'
-{collection} = require './model'
 {hashSync, genSaltSync} = require 'bcrypt'
 
-defaultValue = ->
-  isActive: false
-  createdAt: new Date()
+# ensure email uniqueness 
+db.get('user').ensureIndex {email: 1}, {unique: true}
 
+# set default value for inserting user data
+db.addMiddleware (context) -> (next) -> (args, method) ->
+  if context.collection.name == 'user' and method == 'insert'
+    _.defaults args.data, 
+      isActive: false
+      createdAt: new Date()
+  next args, method
 
 module.exports =
   register: (ctx) ->
     try
       {email, password} = ctx.request.body
       password = hashSync password, genSaltSync()
-      data = _.defaults {email, password}, defaultValue()
-      r = (await collection('user')).insertOneAsync data
-      ctx.body = _.extend data, id: r.insertedId
+      ctx.body = await db.get('user').insert {email, password}
     catch err
       ctx.throw 500, err.toString()
 

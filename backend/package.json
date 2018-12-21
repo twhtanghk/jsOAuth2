@@ -36,7 +36,8 @@
     "koa-router": "^7.4.0",
     "koa-session": "^5.10.0",
     "koa-static": "^5.0.0",
-    "mongodb-uri": "^0.9.7"
+    "mongodb-uri": "^0.9.7",
+    "monk": "^6.0.6"
   },
   "dependencies": {
     "mongodb": "^3.1.10"
