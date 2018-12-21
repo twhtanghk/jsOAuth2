@@ -2,8 +2,7 @@
   <v-app>
     <toolbar />
     <v-container fluid>
-      <login v-if="action == 'login'"/>
-      <register v-if="action == 'register'"/>
+      <router-view />
     </v-container>
   </v-app>
 </template>
@@ -20,14 +19,8 @@ export default
   name: 'app'
   components:
     toolbar: require('./toolbar').default
-    register: require('./register').default
-    login: require('./login').default
   data: ->
     eventBus: eventBus
-    action: 'login'
-  created: ->
-    eventBus.$on 'register', =>
-      @action = 'register'
 </script>
 
 <style lang='scss'>

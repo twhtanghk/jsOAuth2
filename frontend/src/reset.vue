@@ -4,18 +4,7 @@
       <v-text-field v-model='email' label='Email' required />
     </v-layout>
     <v-layout row>
-      <v-text-field v-model='password' label='Password' type='password' required />
-    </v-layout>
-    <v-layout row>
-      <v-btn type='submit'>Sign in</v-btn>
-    </v-layout>
-    <v-layout row>
-      <v-flex xs6>
-        <a class='left' href='#/reset'>I can't access my account</a>
-      </v-flex>
-      <v-flex xs6>
-        <a class='right' href='#/register'>Sign up</a>
-      </v-flex>
+      <v-btn type='submit'>Reset</v-btn>
     </v-layout>
   </v-form>
 </template>
