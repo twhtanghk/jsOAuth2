@@ -37,9 +37,8 @@
     "koa-session": "^5.10.0",
     "koa-static": "^5.0.0",
     "mongodb-uri": "^0.9.7",
-    "monk": "^6.0.6"
+    "monk": "^6.0.6",
+    "nodemailer": "^4.7.0"
   },
-  "dependencies": {
-    "mongodb": "^3.1.10"
-  }
+  "dependencies": {}
 }

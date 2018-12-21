@@ -3,9 +3,6 @@ db = require './db'
 _ = require 'lodash'
 {hashSync, genSaltSync} = require 'bcrypt'
 
-# ensure email uniqueness 
-db.get('user').createIndex {email: 1}, {unique: true}
-
 # set default value for inserting user data
 db.addMiddleware (context) -> (next) -> (args, method) ->
   if context.collection.name == 'user' and method == 'insert'
@@ -30,6 +27,9 @@ db.addMiddleware (context) -> (next) -> (args, method) ->
             res
       else
         res
+
+# ensure email uniqueness 
+db.get('user').createIndex {email: 1}, {unique: true}
 
 module.exports =
   register: (ctx) ->
