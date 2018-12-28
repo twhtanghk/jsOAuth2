@@ -4,6 +4,8 @@ module.exports =
     keys: process.env.KEYS?.split(',') || ['keep it secret']
   model:
     url: process.env.DB || 'mongodb://@mongo:27017/auth'
+  # minute to expire the registration
+  expiredTime: parseInt process.env.EXPIRED_TIME
   email:
     opts:
       host: process.env.SMTP_HOST || 'smtp.abc.com'
