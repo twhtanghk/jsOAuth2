@@ -1,5 +1,5 @@
 <template>
-  <v-form action='user/register'>
+  <v-form @submit.stop.prevent='register'>
     <v-layout row>
       <v-text-field v-model='email' label='Email' required />
     </v-layout>
@@ -10,7 +10,7 @@
       <v-text-field v-model='passwordAgain' label='Password confirmation' type='password' required />
     </v-layout>
     <v-layout row>
-      <v-btn class='login' @click='register'>Create account</v-btn>
+      <v-btn class='login' type='submit'>Create account</v-btn>
     </v-layout>
   </v-form>
 </template>
@@ -28,7 +28,10 @@ export default
       if @password == '' or @password != @passwordAgain
         console.error 'mismatch password'
         return
-      User.register @email, @password
+      User
+        .register @email, @password
+        .then =>
+          @$router.push path: '/user/login'
 </script>
 
 <style scoped>
