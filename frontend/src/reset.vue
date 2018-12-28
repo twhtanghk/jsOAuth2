@@ -1,5 +1,5 @@
 <template>
-  <v-form action='user/login'>
+  <v-form @submit.stop.prevent='reset'>
     <v-layout row>
       <v-text-field v-model='email' label='Email' required />
     </v-layout>
@@ -16,20 +16,13 @@
 export default
   data: ->
     email: ''
-    password: ''
   methods:
-    login: ->
-      User.login @email, @password
-    register: ->
-      eventBus.$emit 'register'
+    reset: ->
+      User.reset @email
 </script>
 
 <style scoped>
 button {
   margin: 0;
-}
-
-a {
-  margin-top: 1.5em;
 }
 </style>
