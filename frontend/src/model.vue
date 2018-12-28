@@ -1,4 +1,5 @@
 <script lang='coffee'>
+url = require 'url'
 Vue = require('vue').default
 Vue.use require('vue.model/src/plugin').default
 {eventBus} = require('./lib').default
@@ -24,6 +25,9 @@ export default
           data:
             email: email
             password: password
+      activate: (hash) ->
+        @get
+          url: url.format pathname: 'user/activate', query: hash: hash
       login: (email, password) ->
         @post 
           url: 'user/login'
