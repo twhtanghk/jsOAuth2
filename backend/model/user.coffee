@@ -60,7 +60,6 @@ module.exports =
 
   activate: (ctx) ->
     try
-      debugger
       query = _.pick ctx.params, 'hash'
       update =
         $set:
@@ -80,14 +79,28 @@ module.exports =
         ctx.session = user: user
         ctx.response.body = user
       else
-        ctx.response.status = 401
+        ctx.response.status = 403
     catch err
       ctx.throw 500, err.toString()
     
+  logout: (ctx) ->
+    ctx.session = null
+    ctx.response.body = {}
+
   find: (ctx) ->
+    try
+      debugger
+      optsField = ['limit', 'skip', 'sort']
+      opts = _.pick ctx.request.body, optsField
+      opts = _.defaults opts, {limit: 30, skip: 0}
+      query = _.omit ctx.request.body, optsField
+      ctx.response.body = await db.get('user').find query, opts
+      ctx.response.body = ctx.response.body.map (user) ->
+        _.omit user, 'password'
+    catch err
+      ctx.throw 500, err.toString()
 
   findOne: (ctx) ->
-    debugger
     if ctx.params.id == 'me'
       if ctx.session.user?
         ctx.response.body = ctx.session.user
