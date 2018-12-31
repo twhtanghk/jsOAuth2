@@ -8,6 +8,7 @@ isAuthorized = require './policy/isAuthorized'
 module.exports = router
   .post '/user/register', user.register
   .post '/user/login', user.login
+  .get '/user/logout', user.logout
   .get '/user', user.find
   .get '/user/activate', user.activate
   .get '/user/:id', user.findOne
