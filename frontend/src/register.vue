@@ -10,7 +10,7 @@
       <v-text-field v-model='passwordAgain' label='Password confirmation' type='password' required />
     </v-layout>
     <v-layout row>
-      <v-btn class='login' type='submit'>Create account</v-btn>
+      <v-btn type='submit'>Create account</v-btn>
     </v-layout>
   </v-form>
 </template>
@@ -30,7 +30,7 @@ export default
         return
       User
         .register @email, @password
-        .then =>
+        .then ->
           @$router.push path: '/user/login'
 </script>
 
