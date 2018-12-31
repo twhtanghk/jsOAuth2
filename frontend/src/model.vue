@@ -9,7 +9,7 @@ export default
     extends: Vue.component 'model'
     props:
       baseUrl:
-        default: 'api/user'
+        default: 'user'
       eventBus:
         default: eventBus
     methods:
@@ -18,7 +18,7 @@ export default
         data.updatedAt = new Date data.updatedAt
         data
       me: ->
-        await @read data: id: 'me'
+        @read data: id: 'me'
       register: (email, password) ->
         @post 
           url: 'user/register'
