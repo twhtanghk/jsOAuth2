@@ -9,18 +9,22 @@
 
 <script lang='coffee'>
 Vue = require('vue').default
+require './font'
 {eventBus} = require('./lib').default
 {User} = require('./model').default
-Vuetify = require 'vuetify'
 
-Vue.use Vuetify
+Vue.use require 'vuetify'
 
 export default
   name: 'app'
   components:
     toolbar: require('./toolbar').default
-  data: ->
-    eventBus: eventBus
+  created: ->
+    try
+      user = await User.me()
+      eventBus.$emit 'auth', user
+    catch err
+      return
 </script>
 
 <style lang='scss'>
