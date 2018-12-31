@@ -50,17 +50,17 @@ db.addMiddleware (context) -> (next) -> (args, method) ->
 db.get('user').createIndex {email: 1}, {unique: true}
 
 module.exports =
-  register: (ctx, next) ->
+  register: (ctx) ->
     try
       {email, password} = ctx.request.body
       password = hashSync password, genSaltSync()
       ctx.body = await db.get('user').insert {email, password}
-      await next()
     catch err
       ctx.throw 500, err.toString()
 
-  activate: (ctx, next) ->
+  activate: (ctx) ->
     try
+      debugger
       query = _.pick ctx.params, 'hash'
       update =
         $set:
@@ -68,11 +68,10 @@ module.exports =
         $unset:
           hash: ''
       ctx.body = await db.get('user').findOneAndUpdate query, update
-      await next()
     catch err
       ctx.throw 500, err.toString()
 
-  login: (ctx, next) ->
+  login: (ctx) ->
     try
       {email, password} = ctx.request.body
       user = await db.get('user').findOne {email}
@@ -82,13 +81,24 @@ module.exports =
         ctx.response.body = user
       else
         ctx.response.status = 401
-      await next()
     catch err
       ctx.throw 500, err.toString()
     
-  find: (ctx, next) ->
+  find: (ctx) ->
 
   findOne: (ctx) ->
+    debugger
+    if ctx.params.id == 'me'
+      if ctx.session.user?
+        ctx.response.body = ctx.session.user
+      else
+        ctx.throw 403
+    else
+      try
+        user = await db.get('user').findOne _id: ctx.params.id
+        ctx.response.body = _.omit user, 'password'
+      catch err
+        ctx.throw 500, err.toString()
 
   update: (ctx) ->
 
