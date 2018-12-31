@@ -1,4 +1,5 @@
 <template>
+<v-container fluid>
   <v-form @submit.stop.prevent='login'>
     <v-layout row>
       <v-text-field v-model='email' label='Email' required />
@@ -18,6 +19,7 @@
       </v-flex>
     </v-layout>
   </v-form>
+</v-container>
 </template>
 
 <script lang='coffee'>
@@ -30,8 +32,13 @@ export default
     password: ''
   methods:
     login: ->
-      user = await User.login @email, @password
-      eventBus.$emit 'auth', user
+      User
+        .login @email, @password
+        .then (user) =>
+          eventBus.$emit 'auth', user
+          @$router.push path: '/user'
+        .catch ->
+          return
 </script>
 
 <style scoped>

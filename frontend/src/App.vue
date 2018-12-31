@@ -1,9 +1,7 @@
 <template>
   <v-app>
     <toolbar />
-    <v-container fluid>
-      <router-view />
-    </v-container>
+    <router-view />
   </v-app>
 </template>
 
@@ -20,11 +18,13 @@ export default
   components:
     toolbar: require('./toolbar').default
   created: ->
-    try
-      user = await User.me()
-      eventBus.$emit 'auth', user
-    catch err
-      return
+    User
+      .me()
+      .then (user) =>
+        eventBus.$emit 'auth', user
+        @$router.push path: '/user'
+      .catch ->
+        return
 </script>
 
 <style lang='scss'>

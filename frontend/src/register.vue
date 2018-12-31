@@ -1,4 +1,5 @@
 <template>
+<v-container fluid>
   <v-form @submit.stop.prevent='register'>
     <v-layout row>
       <v-text-field v-model='email' label='Email' required />
@@ -13,6 +14,7 @@
       <v-btn type='submit'>Create account</v-btn>
     </v-layout>
   </v-form>
+</v-container>
 </template>
 
 <script lang='coffee'>

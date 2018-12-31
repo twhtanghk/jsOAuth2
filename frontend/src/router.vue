@@ -9,7 +9,9 @@ export default new VueRouter
     {path: '/user/register', component: require('./register').default}
     {path: '/user/activate', component: require('./activate').default}
     {path: '/user/login', component: require('./login').default}
+    {path: '/user/logout', component: require('./logout').default}
     {path: '/user/reset', component: require('./reset').default}
+    {path: '/user', component: require('./list').default}
     {path: '*', redirect: '/user/login'}
   ]
 </script>

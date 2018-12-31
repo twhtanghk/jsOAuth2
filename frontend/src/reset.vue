@@ -1,4 +1,5 @@
 <template>
+<v-container fluid>
   <v-form @submit.stop.prevent='reset'>
     <v-layout row>
       <v-text-field v-model='email' label='Email' required />
@@ -7,6 +8,7 @@
       <v-btn type='submit'>Reset</v-btn>
     </v-layout>
   </v-form>
+</v-container>
 </template>
 
 <script lang='coffee'>

@@ -34,4 +34,6 @@ export default
           data:
             email: email
             password: password
+      logout: ->
+        @get url: 'user/logout'
 </script>

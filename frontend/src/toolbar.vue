@@ -33,10 +33,13 @@ export default
       Applications: ->
       'Change Password': ->
       'Delete Account': ->
-      Logout: ->
+      Logout: =>
+        @user = null
+        @$router.push path: '/user/logout'
   created: ->
-    eventBus.$on 'auth', (user) =>
-      @user = user
+    eventBus
+      .$on 'auth', (user) =>
+        @user = user
 </script>
 
 <style scoped>
