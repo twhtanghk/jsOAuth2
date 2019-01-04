@@ -12,6 +12,7 @@ require './font'
 {User} = require('./model').default
 
 Vue.use require 'vuetify'
+Vue.use require('vuelidate').default
 
 export default
   name: 'app'
