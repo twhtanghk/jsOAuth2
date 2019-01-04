@@ -2,7 +2,7 @@
 <v-container fluid>
   <v-form @submit.stop.prevent='reset'>
     <v-layout row>
-      <v-text-field v-model='email' label='Email' required />
+      <v-text-field v-model='email' label='Email' :rules='[emailRequired, emailValid]' required />
     </v-layout>
     <v-layout row>
       <v-btn type='submit'>Reset</v-btn>
@@ -12,15 +12,24 @@
 </template>
 
 <script lang='coffee'>
-{eventBus} = require('./lib').default
 {User} = require('./model').default
+{required, email} = require 'vuelidate/lib/validators'
 
 export default
   data: ->
     email: ''
+  validations:
+    email: { required, email }
   methods:
     reset: ->
-      User.reset @email
+      @$v.$touch()
+      if not @$v.$invalid
+        User
+          .reset @email
+    emailRequired: ->
+      @$v.email.required || 'Required'
+    emailValid: ->
+      @$v.email.email || 'Invalid email address'
 </script>
 
 <style scoped>

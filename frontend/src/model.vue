@@ -36,4 +36,6 @@ export default
             password: password
       logout: ->
         @get url: 'user/logout'
+      reset: (email) ->
+        @put url: "user/reset/#{email}"
 </script>
