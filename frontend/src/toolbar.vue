@@ -1,7 +1,7 @@
 <template>
   <v-toolbar color='primary' dark>
     <v-toolbar-title class="white--text">
-      <router-link class='title' to='/user/login'>
+      <router-link class='title' :to="user ? '/user' : '/user/login'">
         Home
       </router-link>
     </v-toolbar-title>
