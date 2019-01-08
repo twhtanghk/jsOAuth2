@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <toolbar />
+    <alert />
     <router-view />
   </v-app>
 </template>
@@ -18,6 +19,7 @@ export default
   name: 'app'
   components:
     toolbar: require('./toolbar').default
+    alert: require('./alert').default
   created: ->
     User
       .me()
