@@ -3,6 +3,7 @@ db = require './db'
 _ = require 'lodash'
 {compareSync, hashSync, genSaltSync} = require 'bcrypt'
 {createTransport} = require 'nodemailer'
+{isEmail} = require 'validator'
 
 # ensure email uniqueness 
 db.get('user').createIndex {email: 1}, {unique: true}
@@ -45,23 +46,24 @@ module.exports =
   # check if registration is expired
   registerExpire: (ctx, next) ->
     try
-      debugger
       user = await db.get('user').findOne registerHash: ctx.query.hash
       if user?.createdAt.getTime() + cfg.expiredTime * 60000 > Date.now()
         await next()
       else
-        ctx.response.body = error: 'Registration expired'
+        ctx.response.status = 403
+        ctx.response.body = error:  'Registration expired'
     catch err
       ctx.throw 500, err.toString()
 
   # check if reset is expired
   resetExpire: (ctx, next) ->
     try
-      await user = db.get('user').findOne resetHash: ctx.params.hash
+      user = await db.get('user').findOne resetHash: ctx.request.body.hash
       if user?.resetAt.getTime() + cfg.expiredTime * 60000 > Date.now()
         await next()
       else
-        ctx.response.body = error: 'Registration expired'
+        ctx.response.status = 403
+        ctx.response.body = error: 'Reset password expired'
     catch err
       ctx.throw 500, err.toString()
       
@@ -72,16 +74,14 @@ module.exports =
         $set:
           isActive: true
         $unset:
-          hash: ''
+          registerHash: ''
       ctx.body = await db.get('user').findOneAndUpdate query, update
-      debugger
       await next()
     catch err
       ctx.throw 500, err.toString()
 
   login: (ctx, next) ->
     try
-      debugger
       {email, password} = ctx.request.body
       user = await db.get('user').findOne {email}
       if user? and user.isActive and compareSync password, user.password
@@ -108,20 +108,22 @@ module.exports =
     catch err
       ctx.throw 500, err.toString()
 
-  findOne: (ctx, next) ->
+  me: (ctx, next) ->
     if ctx.params.id == 'me'
       if ctx.session.user?
-        ctx.response.body = ctx.session.user
+        ctx.params.id = ctx.session.user._id.toString()
         await next()
       else
         ctx.throw 403
     else
-      try
-        user = await db.get('user').findOne _id: ctx.params.id
-        ctx.response.body = _.omit user, 'password'
-        await next()
-      catch err
-        ctx.throw 500, err.toString()
+      await next()
+
+  findOne: (ctx, next) ->
+    try
+      ctx.body = await db.get('user').findOne _id: ctx.params.id
+      await next()
+    catch err
+      ctx.throw 500, err.toString()
 
   validEmail: (ctx, next) ->
     if isEmail ctx.params.email
@@ -131,11 +133,13 @@ module.exports =
 
   reset: (ctx, next) ->
     try
-      query = _.pick ctx.params, 'email'
+      email = ctx.params.email
+      query = {email}
       now = new Date()
       update = 
-        resetAt: now
-        resetHash: require('object-hash') {email, resetAt: now}
+        $set:
+          resetAt: now
+          resetHash: require('object-hash') {email, resetAt: now}
       ctx.response.body = await db.get('user').findOneAndUpdate query, update
       await next()
     catch err
