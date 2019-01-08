@@ -2,10 +2,10 @@
 <v-container fluid>
   <v-form @submit.stop.prevent='login'>
     <v-layout row>
-      <v-text-field v-model='email' label='Email' :rules='[emailRequired, emailValid]' required />
+      <v-text-field v-model='email' label='Email' :rules='[required($v.email), emailValid($v.email)]' required />
     </v-layout>
     <v-layout row>
-      <v-text-field v-model='password' label='Password' type='password' :rules='[passRequired, passMin]' required />
+      <v-text-field v-model='password' label='Password' type='password' :rules='[required($v.password), minLength($v.password)]' required />
     </v-layout>
     <v-layout row>
       <v-btn type='submit'>Sign in</v-btn>
@@ -26,6 +26,7 @@
 {eventBus} = require('./lib').default
 {User} = require('./model').default
 {required, email, minLength} = require 'vuelidate/lib/validators'
+rule = require('./rule').default
 
 export default
   data: ->
@@ -45,14 +46,9 @@ export default
             @$router.push path: '/user'
           .catch ->
             return
-    emailRequired: ->
-      @$v.email.required || 'Required'
-    emailValid: ->
-      @$v.email.email || 'Invalid email address'
-    passRequired: ->
-      @$v.password.required || 'Required'
-    passMin: ->
-      @$v.password.minLength || "At least #{@$v.password.$params.minLength.min} characters}"
+    required: rule.required
+    emailValid: rule.email
+    minLength: rule.minLength
 </script>
 
 <style scoped>
