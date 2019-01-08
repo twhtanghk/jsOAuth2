@@ -38,4 +38,6 @@ export default
         @get url: 'user/logout'
       reset: (email) ->
         @put url: "user/reset/#{email}"
+      resetPass: (hash, password) ->
+        @put url: 'user/reset', data: {hash, password}
 </script>

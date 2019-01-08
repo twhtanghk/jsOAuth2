@@ -1,6 +1,9 @@
 <template>
 <v-container fluid>
-  <v-form @submit.stop.prevent='submit'>
+  <v-form @submit.stop.prevent='passwd'>
+    <v-layout row>
+      <v-text-field v-model='oldPassword' label='Old password' type='password' :rules='[required($v.oldPassword), minLength($v.oldPassword)]' required />
+    </v-layout>
     <v-layout row>
       <v-text-field v-model='password' label='New password' type='password' :rules='[required($v.password), minLength($v.password)]' required />
     </v-layout>
@@ -8,37 +11,36 @@
       <v-text-field v-model='passwordAgain' label='New password confirmation' type='password' :rules='[required($v.passwordAgain), minLength($v.passwordAgain), match($v.password, $v.passwordAgain)]' required />
     </v-layout>
     <v-layout row>
-      <v-btn type='submit'>Reset</v-btn>
+      <v-btn type='submit'>Change</v-btn>
     </v-layout>
   </v-form>
 </v-container>
 </template>
 
 <script lang='coffee'>
-url = require 'url'
-{eventBus} = require('./lib').default
 {User} = require('./model').default
-{required, minLength} = require 'vuelidate/lib/validators'
-rule = require('./rule').default
+{required, email, minLength} = require 'vuelidate/lib/validators'
+rule = require('./rule.vue').default
 
 export default
   data: ->
-    hash: ''
+    oldPassword: ''
     password: ''
     passwordAgain: ''
   validations:
+    oldPassword: { required, minLength: minLength(6) }
     password: { required, minLength: minLength(6) }
     passwordAgain: { required, minLength: minLength(6) }
   methods:
-    submit: ->
+    passwd: ->
       User
-        .resetPass @hash, @password
+        .passwd @oldPassword, @password
+        .then ->
+          @$router.push path: '/user'
     required: rule.required
+    emailValid: rule.email
     minLength: rule.minLength
     match: rule.match
-  created: ->
-    {query} = url.parse window.location.toString(), true
-    @hash = query.hash
 </script>
 
 <style scoped>

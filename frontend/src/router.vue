@@ -12,6 +12,7 @@ export default new VueRouter
     {path: '/user/logout', component: require('./logout').default}
     {path: '/user/reset', component: require('./reset').default}
     {path: '/user/resetPass', component: require('./resetPass').default}
+    {path: '/user/passwd', component: require('./passwd').default}
     {path: '/user', component: require('./list').default}
     {path: '*', redirect: '/user/login'}
   ]
