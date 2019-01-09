@@ -30,13 +30,17 @@ export default
   validations:
     email: { required, email }
     password: { required, minLength: minLength(6) }
-    passwordAgain: { required, minLength: minLength(6) }
   methods:
     register: ->
-      User
-        .register @email, @password
-        .then ->
-          @$router.push path: '/user/login'
+      @$v.$touch()
+      if not @$v.$invalid
+        User
+          .register @email, @password
+          .then ->
+            @$router.push path: '/user/login'
+            console.info 'You have successfully registered. Please open the notification email and follow the steps to activate your account accordingly'
+          .catch (err) ->
+            console.error err.toString()
     required: rule.required
     emailValid: rule.email
     minLength: rule.minLength
