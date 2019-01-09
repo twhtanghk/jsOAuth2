@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-layout column>
-      <v-flex xs6 offset-xs6>
+      <v-flex>
         <v-alert dismissible transition='fade' v-for='(alert, i) in alerts' :value='alerts.length' :type='alert.type' @input='close($event, i)'>
           {{alert.msg}}
         </v-alert>
@@ -36,6 +36,8 @@ export default
 .container {
   z-index: 4;
   position: absolute;
+  left: 50%;
+  width: 50%;
 
   .v-alert {
     border-radius: .5em;
