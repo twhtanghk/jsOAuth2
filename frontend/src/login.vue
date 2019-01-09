@@ -44,8 +44,8 @@ export default
           .then (user) =>
             eventBus.$emit 'auth', user
             @$router.push path: '/user'
-          .catch ->
-            return
+          .catch (err) ->
+            console.error err.toString()
     required: rule.required
     emailValid: rule.email
     minLength: rule.minLength
