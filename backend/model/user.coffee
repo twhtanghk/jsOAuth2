@@ -8,6 +8,18 @@ _ = require 'lodash'
 # ensure email uniqueness 
 db.get('user').createIndex {email: 1}, {unique: true}
 
+# remove any expired registration
+db.addMiddleware (context) -> (next) -> (args, method) ->
+  db
+    .get 'user'
+    .remove
+      registerHash:
+        $exists: true
+      createdAt:
+        $lt: new Date(Date.now() - cfg.expiredTime * 60000)
+    .then ->
+      next args, method
+
 module.exports =
   omitAttr: (ctx) ->
     attrs = [ 'password', 'registerHash', 'resetHash' ]
@@ -47,11 +59,11 @@ module.exports =
   registerExpire: (ctx, next) ->
     try
       user = await db.get('user').findOne registerHash: ctx.query.hash
-      if user?.createdAt.getTime() + cfg.expiredTime * 60000 > Date.now()
-        await next()
-      else
+      if cfg.isExpired user?.createdAt
         ctx.response.status = 403
         ctx.response.body = error:  'Registration expired'
+      else
+        await next()
     catch err
       ctx.throw 500, err.toString()
 
@@ -59,11 +71,11 @@ module.exports =
   resetExpire: (ctx, next) ->
     try
       user = await db.get('user').findOne resetHash: ctx.request.body.hash
-      if user?.resetAt.getTime() + cfg.expiredTime * 60000 > Date.now()
-        await next()
-      else
+      if cfg.isExpired user?.resetAt
         ctx.response.status = 403
         ctx.response.body = error: 'Reset password expired'
+      else
+        await next()
     catch err
       ctx.throw 500, err.toString()
       
@@ -84,12 +96,21 @@ module.exports =
     try
       {email, password} = ctx.request.body
       user = await db.get('user').findOne {email}
-      if user? and user.isActive and compareSync password, user.password
-        ctx.session = user: user
-        ctx.response.body = user
-        await next()
+      if user?
+        if user.isActive 
+          if compareSync password, user.password
+            ctx.session = user: user
+            ctx.response.body = user
+            await next()
+          else
+            ctx.response.status = 403
+            ctx.response.body = error: 'invalid password'
+        else
+          ctx.response.status = 403
+          ctx.response.body = error: 'user not yet activate'
       else
         ctx.response.status = 403
+        ctx.response.body = error: 'user not found'
     catch err
       ctx.throw 500, err.toString()
     
