@@ -7,6 +7,8 @@ module.exports =
     url: process.env.DB || 'mongodb://@mongo:27017/auth'
   # minute to expire the registration
   expiredTime: parseInt process.env.EXPIRED_TIME
+  isExpired: (date) ->
+    date.getTime + module.exports.expiredTime * 60000 < Date.now()
   email:
     opts:
       host: process.env.SMTP_HOST || 'smtp.abc.com'
