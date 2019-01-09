@@ -14,8 +14,10 @@ export default
         default: eventBus
     methods:
       format: (data) ->
-        data.createdAt = new Date data.createdAt
-        data.updatedAt = new Date data.updatedAt
+        if data.createAt?
+          data.createdAt = new Date data.createdAt
+        if data.updatedAt?
+          data.updatedAt = new Date data.updatedAt
         data
       me: ->
         @read data: id: 'me'
