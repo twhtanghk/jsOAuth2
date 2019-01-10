@@ -8,7 +8,7 @@
       <v-text-field v-model='password' label='Password' type='password' :rules='[required($v.password), minLength($v.password)]' required />
     </v-layout>
     <v-layout row>
-      <v-text-field v-model='passwordAgain' label='Password confirmation' type='password' :rules='[required($v.passwordAgain), minLength($v.passwordAgain), match($v.password, $v.passwordAgain)]' required />
+      <v-text-field v-model='passwordAgain' label='Password confirmation' type='password' :rules='[required($v.passwordAgain), match($v.password, $v.passwordAgain)]' required />
     </v-layout>
     <v-layout row>
       <v-btn type='submit'>Create account</v-btn>
@@ -30,6 +30,7 @@ export default
   validations:
     email: { required, email }
     password: { required, minLength: minLength(6) }
+    passwordAgain: { required }
   methods:
     register: ->
       @$v.$touch()
