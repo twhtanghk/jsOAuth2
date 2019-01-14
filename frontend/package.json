@@ -29,7 +29,7 @@
     "sass-loader": "^7.1.0",
     "vue-router": "^3.0.2",
     "vue-template-compiler": "^2.5.17",
-    "vue.model": "git+https://github.com/twhtanghk/vue.model.git",
+    "vue.model": "https://github.com/twhtanghk/vue.model",
     "vue.oauth2": "git+https://github.com/twhtanghk/vue.oauth2.git",
     "vuetify": "^1.3.14"
   },

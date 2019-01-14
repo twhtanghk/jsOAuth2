@@ -1,7 +1,7 @@
 CompressionWebpackPlugin = require 'compression-webpack-plugin'
 
 module.exports =
-  baseUrl: './'
+  publicPath: './'
   outputDir: '../backend/dist'
   lintOnSave: false
   devServer:
