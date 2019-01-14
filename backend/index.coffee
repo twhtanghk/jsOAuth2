@@ -6,6 +6,7 @@ bodyParser = require 'koa-bodyparser'
 methodOverride = require 'koa-methodoverride'
 router = require './router'
 serve = require 'koa-static'
+CSRF = require 'koa-csrf'
 
 app = new Koa()
 app.keys = cfg.session.keys
@@ -14,6 +15,11 @@ module.exports = app
   .use session {}, app
   .use bodyParser()
   .use methodOverride()
+  .use new CSRF
+    invalidTokenMessage: JSON.stringify error: 'Invalid CSRF token'
+  .use (ctx, next) ->
+    ctx.cookies.set 'csrfToken', ctx.csrf, httpOnly: false
+    await next()
   .use router.routes()
   .use router.allowedMethods()
   .use serve 'dist'
