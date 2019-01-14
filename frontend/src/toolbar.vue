@@ -31,7 +31,8 @@ export default
     user: null
     actions:
       Applications: ->
-      'Change Password': ->
+      'Change Password': =>
+        @$router.push path: '/user/passwd'
       'Delete Account': ->
       Logout: =>
         @user = null

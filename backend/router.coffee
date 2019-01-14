@@ -12,8 +12,9 @@ module.exports = router
   .get '/user/logout', logout
   .put '/user/reset/:email', validEmail, reset, resetMail, omitAttr
   .put '/user/reset', resetExpire, resetPass, omitAttr
-  .post '/user/password', changePass, omitAttr
+  .put '/user/password', isAuthenticated, changePass, omitAttr
   .get '/user', find, omitAttr
-  .get '/user/:id', me, findOne, omitAttr
+  .get '/user/me', isAuthenticated, me, findOne, omitAttr
+  .get '/user/:id', findOne, omitAttr
   .put '/user/:id', isAuthenticated, isAuthorized, update, omitAttr
   .delete '/user/:id', isAuthenticated, isAuthorized, destroy, omitAttr

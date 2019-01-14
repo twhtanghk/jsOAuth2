@@ -42,6 +42,8 @@ export default
         @put url: "user/reset/#{email}"
       resetPass: (hash, password) ->
         @put url: 'user/reset', data: {hash, password}
+      passwd: (oldpass, newpass) ->
+        @put url: 'user/password', data: {oldpass, newpass}
     created: ->
       @mw.unshift @csrf
 </script>

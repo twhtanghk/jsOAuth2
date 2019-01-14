@@ -115,7 +115,7 @@ module.exports =
       ctx.throw 500, err.toString()
     
   logout: (ctx) ->
-    ctx.session = null
+    ctx.session.user = null
     ctx.response.body = {}
 
   find: (ctx, next) ->
@@ -196,13 +196,22 @@ module.exports =
 
   changePass: (ctx, next) ->
     try
-      {email, password} = ctx.request.body
-      query = email: email
-      update =
-        $set:
-          password: hashSync password, genSaltSync()
-      ctx.response.body = db.get('user').findOneAndUpdate query, update
-      await next()
+      {email} = ctx.session.user
+      {oldpass, newpass} = ctx.request.body
+      user = await db.get('user').findOne {email}
+      if user?
+        if compareSync oldpass, user.password
+          update = 
+            $set:
+              password: hashSync newpass, genSaltSync()
+          ctx.response.body = await db.get('user').findOneAndUpdate {email}, update
+          await next()
+        else
+          ctx.response.status = 403
+          ctx.response.body = error: 'invalid password'
+      else
+        ctx.response.status = 403
+        ctx.response.body = error: 'user not found'
     catch err
       ctx.throw 500, err.toString()
 

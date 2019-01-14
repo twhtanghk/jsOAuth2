@@ -8,7 +8,7 @@
       <v-text-field v-model='password' label='New password' type='password' :rules='[required($v.password), minLength($v.password)]' required />
     </v-layout>
     <v-layout row>
-      <v-text-field v-model='passwordAgain' label='New password confirmation' type='password' :rules='[required($v.passwordAgain), minLength($v.passwordAgain), match($v.password, $v.passwordAgain)]' required />
+      <v-text-field v-model='passwordAgain' label='New password confirmation' type='password' :rules='[required($v.passwordAgain), match($v.password, $v.passwordAgain)]' required />
     </v-layout>
     <v-layout row>
       <v-btn type='submit'>Change</v-btn>
@@ -30,12 +30,12 @@ export default
   validations:
     oldPassword: { required, minLength: minLength(6) }
     password: { required, minLength: minLength(6) }
-    passwordAgain: { required, minLength: minLength(6) }
+    passwordAgain: { required }
   methods:
     passwd: ->
       User
         .passwd @oldPassword, @password
-        .then ->
+        .then =>
           @$router.push path: '/user'
     required: rule.required
     emailValid: rule.email
