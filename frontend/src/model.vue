@@ -14,7 +14,7 @@ export default
         default: eventBus
     methods:
       format: (data) ->
-        if data.createAt?
+        if data.createdAt?
           data.createdAt = new Date data.createdAt
         if data.updatedAt?
           data.updatedAt = new Date data.updatedAt
