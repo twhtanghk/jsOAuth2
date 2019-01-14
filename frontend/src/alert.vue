@@ -36,6 +36,9 @@ export default
 .container {
   z-index: 4;
   position: absolute;
+  padding-top: 0;
+  padding-bottom: 0;
+  top: 48px;
   left: 50%;
   width: 50%;
 
