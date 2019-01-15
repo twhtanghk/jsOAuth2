@@ -9,7 +9,7 @@ export default
     extends: Vue.component 'model'
     props:
       baseUrl:
-        default: 'user'
+        default: "user"
       eventBus:
         default: eventBus
     methods:
@@ -23,29 +23,29 @@ export default
         @read data: id: 'me'
       register: (email, password) ->
         @post 
-          url: 'user/register'
+          url: "#{@baseUrl}/register"
           data:
             email: email
             password: password
       activate: (hash) ->
         @get
-          url: url.format pathname: 'user/activate', query: hash: hash
+          url: url.format pathname: "#{@baseUrl}/activate", query: hash: hash
       login: (email, password) ->
         @post 
-          url: 'user/login'
+          url: "#{@baseUrl}/login"
           data:
             email: email
             password: password
       logout: ->
-        @get url: 'user/logout'
+        @get url: "#{@baseUrl}/logout"
       reset: (email) ->
-        @put url: "user/reset/#{email}"
+        @put url: "#{@baseUrl}/reset/#{email}"
       resetPass: (hash, password) ->
-        @put url: 'user/reset', data: {hash, password}
+        @put url: "#{@baseUrl}/reset", data: {hash, password}
       passwd: (oldpass, newpass) ->
-        @put url: 'user/password', data: {oldpass, newpass}
+        @put url: "#{@baseUrl}/password", data: {oldpass, newpass}
       destroy: ->
-        @del url: 'user/me'
+        @del url: "#{@baseUrl}/me"
     created: ->
       @mw.unshift @csrf
 </script>
