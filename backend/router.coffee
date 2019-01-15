@@ -1,6 +1,6 @@
 Router = require 'koa-router'
 router = new Router()
-{omitAttr, register, registerMail, registerExpire, activate, login, logout, validEmail, reset, resetMail, resetExpire, resetPass, changePass, find, me, findOne, update, destroy}= require './model/user'
+{omitAttr, register, registerMail, registerExpire, activate, login, logout, validEmail, reset, resetMail, resetExpire, resetPass, changePass, find, me, findOne, destroy}= require './model/user'
 
 isAuthenticated = require './policy/isAuthenticated'
 isAuthorized = require './policy/isAuthorized'
@@ -16,5 +16,5 @@ module.exports = router
   .get '/user', find, omitAttr
   .get '/user/me', isAuthenticated, me, findOne, omitAttr
   .get '/user/:id', findOne, omitAttr
-  .put '/user/:id', isAuthenticated, isAuthorized, update, omitAttr
+  .delete '/user/me', isAuthenticated, me, destroy, omitAttr
   .delete '/user/:id', isAuthenticated, isAuthorized, destroy, omitAttr

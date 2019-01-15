@@ -130,14 +130,8 @@ module.exports =
       ctx.throw 500, err.toString()
 
   me: (ctx, next) ->
-    if ctx.params.id == 'me'
-      if ctx.session.user?
-        ctx.params.id = ctx.session.user._id.toString()
-        await next()
-      else
-        ctx.throw 403
-    else
-      await next()
+    ctx.params.id = ctx.session.user._id.toString()
+    await next()
 
   findOne: (ctx, next) ->
     try
@@ -215,7 +209,9 @@ module.exports =
     catch err
       ctx.throw 500, err.toString()
 
-  # check if registration is expired
-  update: (ctx, next) ->
-
   destroy: (ctx, next) ->
+    try
+      {id} = ctx.params
+      ctx.response.body = await db.get('user').findOneAndDelete id
+    catch err
+      ctx.throw 500, err.toString()

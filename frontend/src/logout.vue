@@ -7,5 +7,6 @@ export default
     User
       .logout()
       .then =>
+        eventBus.$emit 'logout'
         @$router.push path: '/user/login'
 </script>

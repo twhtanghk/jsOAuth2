@@ -37,6 +37,8 @@ export default
         .passwd @oldPassword, @password
         .then =>
           @$router.push path: '/user'
+        .catch (err) ->
+          console.error err.toString()
     required: rule.required
     emailValid: rule.email
     minLength: rule.minLength
