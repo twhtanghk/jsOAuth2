@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-layout column>
       <v-flex>
-        <v-alert dismissible transition='fade' v-for='(alert, i) in alerts' :value='alerts.length' :type='alert.type' @input='close($event, i)'>
+        <v-alert dismissible transition='fade' v-for='(alert, i) in alerts' :key='i' :value='alerts.length' :type='alert.type' @input='close($event, i)'>
           {{alert.msg}}
         </v-alert>
       </v-flex>
