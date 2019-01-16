@@ -5,18 +5,33 @@ _ = require 'lodash'
 {createTransport} = require 'nodemailer'
 {isEmail} = require 'validator'
 
+model = db.get 'user'
+
 # ensure email uniqueness 
-db.get('user').createIndex {email: 1}, {unique: true}
+model.createIndex {email: 1}, {unique: true}
 
 # remove any expired registration
 db.addMiddleware (context) -> (next) -> (args, method) ->
-  db
-    .get 'user'
+  model
     .remove
       registerHash:
         $exists: true
       createdAt:
         $lt: new Date(Date.now() - cfg.expiredTime * 60000)
+    .then ->
+      next args, method
+
+# remove any expired reset hash
+db.addMiddleware (context) -> (next) -> (args, method) ->
+  query =
+    resetAt:
+      $lt: new Date(Date.now() - cfg.expiredTime * 60000)
+  update =
+    $unset:
+      resetAt: ''
+      resetHash: ''
+  model
+    .update query, update
     .then ->
       next args, method
 
@@ -37,7 +52,7 @@ module.exports =
         password: hashSync password, genSaltSync() 
         isActive: false
         registerHash: require('object-hash') {email, createdAt: new Date()}
-      ctx.body = await db.get('user').insert data
+      ctx.response.body = await model.insert data
       await next()
     catch err
       ctx.throw 500, err.toString()
@@ -47,7 +62,7 @@ module.exports =
       transporter = createTransport cfg.email.opts
       data =
         from: cfg.email.from
-        to: ctx.body.email
+        to: ctx.response.body.email
         subject: cfg.email.user.register.subject
         html: _.template(cfg.email.user.register.html)(url: 'url')
       await transporter.sendMail data
@@ -58,7 +73,7 @@ module.exports =
   # check if registration is expired
   registerExpire: (ctx, next) ->
     try
-      user = await db.get('user').findOne registerHash: ctx.query.hash
+      user = await model.findOne registerHash: ctx.query.hash
       if cfg.isExpired user?.createdAt
         ctx.response.status = 403
         ctx.response.body = error:  'Registration expired'
@@ -70,7 +85,7 @@ module.exports =
   # check if reset is expired
   resetExpire: (ctx, next) ->
     try
-      user = await db.get('user').findOne resetHash: ctx.request.body.hash
+      user = await model.findOne resetHash: ctx.request.body.hash
       if cfg.isExpired user?.resetAt
         ctx.response.status = 403
         ctx.response.body = error: 'Reset password expired'
@@ -87,7 +102,7 @@ module.exports =
           isActive: true
         $unset:
           registerHash: ''
-      ctx.body = await db.get('user').findOneAndUpdate query, update
+      ctx.response.body = await model.findOneAndUpdate query, update
       await next()
     catch err
       ctx.throw 500, err.toString()
@@ -95,7 +110,7 @@ module.exports =
   login: (ctx, next) ->
     try
       {email, password} = ctx.request.body
-      user = await db.get('user').findOne {email}
+      user = await model.findOne {email}
       if user?
         if user.isActive 
           if compareSync password, user.password
@@ -124,7 +139,7 @@ module.exports =
       opts = _.pick ctx.request.body, optsField
       opts = _.defaults opts, {limit: 30, skip: 0}
       query = _.omit ctx.request.body, optsField
-      ctx.response.body = await db.get('user').find query, opts
+      ctx.response.body = await model.find query, opts
       await next()
     catch err
       ctx.throw 500, err.toString()
@@ -135,7 +150,7 @@ module.exports =
 
   findOne: (ctx, next) ->
     try
-      ctx.body = await db.get('user').findOne _id: ctx.params.id
+      ctx.response.body = await model.findOne _id: ctx.params.id
       await next()
     catch err
       ctx.throw 500, err.toString()
@@ -155,7 +170,7 @@ module.exports =
         $set:
           resetAt: now
           resetHash: require('object-hash') {email, resetAt: now}
-      ctx.response.body = await db.get('user').findOneAndUpdate query, update
+      ctx.response.body = await model.findOneAndUpdate query, update
       await next()
     catch err
       ctx.throw 500, err.toString()
@@ -165,7 +180,7 @@ module.exports =
       transporter = createTransport cfg.email.opts
       data =
         from: cfg.email.from
-        to: ctx.body.email
+        to: ctx.response.body.email
         subject: cfg.email.user.reset.subject
         html: _.template(cfg.email.user.reset.html)(url: 'url')
       await transporter.sendMail data
@@ -183,7 +198,7 @@ module.exports =
         $unset:
           resetAt: ''
           resetHash: ''
-      ctx.response.body = db.get('user').findOneAndUpdate query, update
+      ctx.response.body = model.findOneAndUpdate query, update
       await next()
     catch err
       ctx.throw 500, err.toString()
@@ -192,13 +207,13 @@ module.exports =
     try
       {email} = ctx.session.user
       {oldpass, newpass} = ctx.request.body
-      user = await db.get('user').findOne {email}
+      user = await model.findOne {email}
       if user?
         if compareSync oldpass, user.password
           update = 
             $set:
               password: hashSync newpass, genSaltSync()
-          ctx.response.body = await db.get('user').findOneAndUpdate {email}, update
+          ctx.response.body = await model.findOneAndUpdate {email}, update
           await next()
         else
           ctx.response.status = 403
@@ -212,6 +227,6 @@ module.exports =
   destroy: (ctx, next) ->
     try
       {id} = ctx.params
-      ctx.response.body = await db.get('user').findOneAndDelete id
+      ctx.response.body = await model.findOneAndDelete id
     catch err
       ctx.throw 500, err.toString()
