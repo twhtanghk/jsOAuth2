@@ -11,11 +11,14 @@ logger = (context) -> (next) -> (args, method) ->
       res
 
 createdAt = (context) -> (next) -> (args, method) ->
-  _.defaults args.data, createdAt: new Date()
+  if method == 'insert'
+    _.defaults args.data, createdAt: new Date()
   next args, method
 
 updatedAt = (context) -> (next) -> (args, method) ->
-  _.defaults args.data, updatedAt: new Date()
+  if method in [ 'update', 'findOneAndUpdate' ]
+    args.update.$set ?= {}
+    _.defaults args.update.$set, updatedAt: new Date()
   next args, method
 
 db.addMiddleware createdAt
