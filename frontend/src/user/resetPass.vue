@@ -16,10 +16,9 @@
 
 <script lang='coffee'>
 url = require 'url'
-{eventBus} = require('./lib').default
-{User} = require('./model').default
+{User} = require('../model').default
 {required, minLength} = require 'vuelidate/lib/validators'
-rule = require('./rule').default
+rule = require('../rule').default
 
 export default
   data: ->

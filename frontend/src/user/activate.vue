@@ -1,6 +1,6 @@
 <script lang='coffee'>
 url = require 'url'
-{User} = require('./model').default
+{User} = require('../model').default
 
 export default
   created: ->

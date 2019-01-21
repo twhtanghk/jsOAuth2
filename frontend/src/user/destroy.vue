@@ -21,7 +21,7 @@
 </template>
 
 <script lang='coffee'>
-{User} = require('./model').default
+{User} = require('../model').default
 
 export default
   methods:

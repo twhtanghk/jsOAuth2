@@ -25,7 +25,6 @@ export default
       .me()
       .then (user) =>
         eventBus.$emit 'auth', user
-        @$router.push path: '/user'
       .catch ->
         return
 </script>

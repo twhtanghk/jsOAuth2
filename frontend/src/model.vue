@@ -4,14 +4,34 @@ Vue = require('vue').default
 Vue.use require('vue.model/src/plugin').default
 {eventBus} = require('./lib').default
 
+Vue.component 'rest',
+  extends: Vue.component 'model'
+  props:
+    eventBus:
+      default: ->
+        eventBus
+  data: ->
+    mw: [
+      @csrf
+      @json
+      @methodOverride
+      @req
+      @res
+      @error
+    ]
+  methods:
+    fetch: (opts = {}) ->
+      opts.url ?= @baseUrl
+      for i in @mw
+        opts = await i opts
+      opts
+  
 export default
   User: new Vue
-    extends: Vue.component 'model'
+    extends: Vue.component 'rest'
     props:
       baseUrl:
         default: "user"
-      eventBus:
-        default: eventBus
     methods:
       format: (data) ->
         if data.createdAt?
@@ -46,6 +66,19 @@ export default
         @put url: "#{@baseUrl}/password", data: {oldpass, newpass}
       destroy: ->
         @del url: "#{@baseUrl}/me"
-    created: ->
-      @mw.unshift @csrf
+  App: new Vue
+    extends: Vue.component 'rest'
+    props:
+      baseUrl:
+        default: "app"
+      authList:
+        type: Object
+        default: ->
+          code: 'Authorization Code'
+          implicit: 'Implicit Grant'
+          password: 'Resource Owner Password'
+          client: 'Client Crendentials', value: 'client'
+    methods:
+      format: (data) ->
+        _.extend data, authDesc: @authList[data.authType]
 </script>

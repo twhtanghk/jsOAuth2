@@ -18,9 +18,9 @@
 </template>
 
 <script lang='coffee'>
-{User} = require('./model').default
+{User} = require('../model').default
 {required, email, minLength} = require 'vuelidate/lib/validators'
-rule = require('./rule.vue').default
+rule = require('../rule.vue').default
 
 export default
   data: ->
@@ -37,7 +37,9 @@ export default
         .passwd @oldPassword, @password
         .then =>
           @$router.push path: '/user'
-        .catch (err) ->
+        .catch (err) =>
+          if err.message = 'Unauthorized access'
+            @$router.push '/user/login'
           console.error err.toString()
     required: rule.required
     emailValid: rule.email
