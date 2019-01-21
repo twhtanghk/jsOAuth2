@@ -17,7 +17,7 @@
       <v-text-field v-model='cbUrl' label='Redirect URL' :rules='[url($v.cbUrl)]' required />
     </v-layout>
     <v-layout row>
-      <v-btn type='submit'>Create</v-btn>
+      <v-btn type='submit'>Update</v-btn>
     </v-layout>
   </v-form>
 </v-container>
@@ -44,18 +44,30 @@ export default
   methods:
     authList: App.authList
     submit: ->
-      @$v.$touch()
-      if not @$v.$invalid
-        App
-          .create data: _.pick @, 'name', 'clientId', 'clientSecret', 'authType', 'cbUrl'
-          .then =>
-            @$router.push path: '/app/list'
-          .catch (err) =>
-            if err.message == 'Unauthorized access'
-              @$router.push '/user/login'
-            console.error err.toString()
+      try
+        data =
+          id: @$route.params.id
+          name: @name
+          clientId: @clientId
+          clientSecret: @clientSecret
+          authType: @authType
+          cbUrl: @cbUrl
+        app = await App.update {data}
+        @$router.push path: '/app'
+      catch err
+        console.error err.toString()
     required: rule.required
     url: rule.url
+  created: ->
+    try
+      app = await App.read data: id: @$route.params.id
+      @name = app.name
+      @clientId = app.clientId
+      @clientSecret = app.clientSecret
+      @authType = app.authType
+      @cbUrl = app.cbUrl
+    catch err
+      console.error err
 </script>
 
 <style scoped>

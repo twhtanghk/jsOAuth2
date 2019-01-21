@@ -71,14 +71,21 @@ export default
     props:
       baseUrl:
         default: "app"
-      authList:
+      _authList:
         type: Object
         default: ->
           code: 'Authorization Code'
           implicit: 'Implicit Grant'
           password: 'Resource Owner Password'
-          client: 'Client Crendentials', value: 'client'
+          client: 'Client Crendentials'
     methods:
       format: (data) ->
-        _.extend data, authDesc: @authList[data.authType]
+        _.extend super(data), authDesc: @authList[data.authType]
+      authList: ->
+        reducer = (result, desc, key) ->
+          result.push
+            text: desc
+            value: key
+          result
+        _.reduce @_authList, reducer, []
 </script>
