@@ -1,41 +1,53 @@
 cfg = require '../config'
-db = require './db'
 _ = require 'lodash'
+Model = require './model'
 {compareSync, hashSync, genSaltSync} = require 'bcrypt'
 {createTransport} = require 'nodemailer'
 {isEmail} = require 'validator'
 
-model = db.get 'user'
+class User extends Model
+  name: 'user'
 
-# ensure email uniqueness 
-model.createIndex {email: 1}, {unique: true}
+  attributes: [
+    'email'
+    'password'
+    'isActive'
+    'registerHash'
+    'resetHash'
+    'resetAt'
+  ]
 
-# remove any expired registration
-db.addMiddleware (context) -> (next) -> (args, method) ->
-  model
-    .remove
-      registerHash:
-        $exists: true
-      createdAt:
-        $lt: new Date(Date.now() - cfg.expiredTime * 60000)
-    .then ->
-      next args, method
+  constructor: ->
+    super()
 
-# remove any expired reset hash
-db.addMiddleware (context) -> (next) -> (args, method) ->
-  query =
-    resetAt:
-      $lt: new Date(Date.now() - cfg.expiredTime * 60000)
-  update =
-    $unset:
-      resetAt: ''
-      resetHash: ''
-  model
-    .update query, update
-    .then ->
-      next args, method
+    # ensure email uniqueness 
+    @model.createIndex {email: 1}, {unique: true}
 
-module.exports =
+    # remove any expired registration
+    @addMiddleware (context) => (next) => (args, method) =>
+      @model
+        .remove
+          registerHash:
+            $exists: true
+          createdAt:
+            $lt: new Date(Date.now() - cfg.expiredTime * 60000)
+        .then ->
+          next args, method
+
+    # remove any expired reset hash
+    @addMiddleware (context) => (next) => (args, method) =>
+      query =
+        resetAt:
+          $lt: new Date(Date.now() - cfg.expiredTime * 60000)
+      update =
+        $unset:
+          resetAt: ''
+          resetHash: ''
+      @model
+        .update query, update
+        .then ->
+          next args, method
+
   omitAttr: (ctx) ->
     attrs = [ 'password', 'registerHash', 'resetHash' ]
     if Array.isArray ctx.response.body
@@ -52,7 +64,7 @@ module.exports =
         password: hashSync password, genSaltSync() 
         isActive: false
         registerHash: require('object-hash') {email, createdAt: new Date()}
-      ctx.response.body = await model.insert data
+      ctx.response.body = await @model.insert data
       await next()
     catch err
       ctx.throw 500, err.toString()
@@ -73,7 +85,7 @@ module.exports =
   # check if registration is expired
   registerExpire: (ctx, next) ->
     try
-      user = await model.findOne registerHash: ctx.query.hash
+      user = await @model.findOne registerHash: ctx.query.hash
       if cfg.isExpired user?.createdAt
         ctx.response.status = 403
         ctx.response.body = error:  'Registration expired'
@@ -85,7 +97,7 @@ module.exports =
   # check if reset is expired
   resetExpire: (ctx, next) ->
     try
-      user = await model.findOne resetHash: ctx.request.body.hash
+      user = await @model.findOne resetHash: ctx.request.body.hash
       if cfg.isExpired user?.resetAt
         ctx.response.status = 403
         ctx.response.body = error: 'Reset password expired'
@@ -102,7 +114,7 @@ module.exports =
           isActive: true
         $unset:
           registerHash: ''
-      ctx.response.body = await model.findOneAndUpdate query, update
+      ctx.response.body = await @model.findOneAndUpdate query, update
       await next()
     catch err
       ctx.throw 500, err.toString()
@@ -110,7 +122,7 @@ module.exports =
   login: (ctx, next) ->
     try
       {email, password} = ctx.request.body
-      user = await model.findOne {email}
+      user = await @model.findOne {email}
       if user?
         if user.isActive 
           if compareSync password, user.password
@@ -133,27 +145,9 @@ module.exports =
     ctx.session.user = null
     ctx.response.body = {}
 
-  find: (ctx, next) ->
-    try
-      optsField = ['limit', 'skip', 'sort']
-      opts = _.pick ctx.request.body, optsField
-      opts = _.defaults opts, {limit: 30, skip: 0}
-      query = _.omit ctx.request.body, optsField
-      ctx.response.body = await model.find query, opts
-      await next()
-    catch err
-      ctx.throw 500, err.toString()
-
   me: (ctx, next) ->
     ctx.params.id = ctx.session.user._id.toString()
     await next()
-
-  findOne: (ctx, next) ->
-    try
-      ctx.response.body = await model.findOne _id: ctx.params.id
-      await next()
-    catch err
-      ctx.throw 500, err.toString()
 
   validEmail: (ctx, next) ->
     if isEmail ctx.params.email
@@ -170,7 +164,7 @@ module.exports =
         $set:
           resetAt: now
           resetHash: require('object-hash') {email, resetAt: now}
-      ctx.response.body = await model.findOneAndUpdate query, update
+      ctx.response.body = await @model.findOneAndUpdate query, update
       await next()
     catch err
       ctx.throw 500, err.toString()
@@ -198,7 +192,7 @@ module.exports =
         $unset:
           resetAt: ''
           resetHash: ''
-      ctx.response.body = model.findOneAndUpdate query, update
+      ctx.response.body = await @model.findOneAndUpdate query, update
       await next()
     catch err
       ctx.throw 500, err.toString()
@@ -207,13 +201,13 @@ module.exports =
     try
       {email} = ctx.session.user
       {oldpass, newpass} = ctx.request.body
-      user = await model.findOne {email}
+      user = await @model.findOne {email}
       if user?
         if compareSync oldpass, user.password
           update = 
             $set:
               password: hashSync newpass, genSaltSync()
-          ctx.response.body = await model.findOneAndUpdate {email}, update
+          ctx.response.body = await @model.findOneAndUpdate {email}, update
           await next()
         else
           ctx.response.status = 403
@@ -224,9 +218,24 @@ module.exports =
     catch err
       ctx.throw 500, err.toString()
 
-  destroy: (ctx, next) ->
-    try
-      {id} = ctx.params
-      ctx.response.body = await model.findOneAndDelete id
-    catch err
-      ctx.throw 500, err.toString()
+module.exports =
+  new User()
+    .actions [
+      'omitAttr'
+      'me'
+      'register'
+      'registerMail'
+      'registerExpire'
+      'activate'
+      'login'
+      'logout'
+      'validEmail'
+      'reset'
+      'resetMail'
+      'resetExpire'
+      'resetPass'
+      'changePass'
+      'find'
+      'findOne'
+      'destroy'
+    ]
