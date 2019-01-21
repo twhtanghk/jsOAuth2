@@ -218,6 +218,13 @@ class User extends Model
     catch err
       ctx.throw 500, err.toString()
 
+  isAuthorized: (ctx, next) ->
+    {user} = ctx.session
+    {id} = ctx.params
+    if user._id.toString != id and user.email not in cfg.admin
+      return ctx.throw 401
+    await next()
+
 module.exports =
   new User()
     .actions [
@@ -238,4 +245,5 @@ module.exports =
       'find'
       'findOne'
       'destroy'
+      'isAuthorized'
     ]

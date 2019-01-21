@@ -4,7 +4,6 @@ user = require './model/user'
 app = require './model/app'
 
 isAuthenticated = require './policy/isAuthenticated'
-isAuthorized = require './policy/isAuthorized'
 
 module.exports = router
   .post '/user/register', user.register, user.registerMail, user.omitAttr
@@ -18,6 +17,8 @@ module.exports = router
   .get '/user/me', isAuthenticated, user.me, user.findOne, user.omitAttr
   .get '/user/:id', user.findOne, user.omitAttr
   .delete '/user/me', isAuthenticated, user.me, user.destroy, user.omitAttr
-  .delete '/user/:id', isAuthenticated, isAuthorized, user.destroy, user.omitAttr
+  .delete '/user/:id', isAuthenticated, user.isAuthorized, user.destroy, user.omitAttr
   .post '/app', isAuthenticated, app.create
   .get '/app', isAuthenticated, app.find
+  .get '/app/:id', isAuthenticated, app.isAuthorized, app.findOne
+  .put '/app/:id', isAuthenticated, app.isAuthorized, app.update

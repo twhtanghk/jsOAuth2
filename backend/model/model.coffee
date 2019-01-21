@@ -21,8 +21,8 @@ class Model
 
   update: (ctx, next) ->
     try
-      query = _.pick ctx.params, '_id'
-      update = $set: _.pick ctx.body, @attributes
+      query = ctx.params.id
+      update = $set: _.pick ctx.request.body, @attributes
       ctx.response.body = await @model.findOneAndUpdate query, update
       await next()
     catch err
@@ -30,7 +30,7 @@ class Model
 
   findOne: (ctx, next) ->
     try
-      ctx.response.body = await @model.findOne _.pick(ctx.params, '_id')
+      ctx.response.body = await @model.findOne ctx.params.id
       await next()
     catch err
       ctx.throw 500, err.toString()
@@ -48,13 +48,23 @@ class Model
 
   destroy: (ctx, next) ->
     try
-      ctx.response.body = await @model.findOneAndDelete _.pick(ctx.params, '_id')
+      ctx.response.body = await @model.findOneAndDelete ctx.params.id
       await next()
     catch err
       ctx.throw 500, err.toString()
 
-  # return controller actions for the input method names
-  actions: (names = ['create', 'findOne', 'find', 'update', 'destroy']) ->
+  isAuthorized: (ctx, next) ->
+    {user} = ctx.session
+    {id} = ctx.params
+    try
+      app = @model.findOne {_id: id, createdBy: user._id}
+      if app?
+        await next()
+    catch err
+      ctx.throw 500, err.toString()
+ 
+  #return controller actions for the input method names
+  actions: (names = ['create', 'findOne', 'find', 'update', 'destroy', 'isAuthorized']) ->
     reducer = (actions, action) =>
       actions[action] = (ctx, next) =>
         @[action] ctx, next
