@@ -12,7 +12,7 @@ app = new Koa()
 app.keys = cfg.session.keys
 module.exports = app
   .use logger()
-  .use session {}, app
+  .use session {maxAge: cfg.expiredTime * 60000}, app
   .use bodyParser()
   .use methodOverride()
   .use new CSRF
@@ -26,4 +26,3 @@ module.exports = app
   .on 'session:missed', ->
     console.log 'sess missed'
   .listen cfg.port
-
