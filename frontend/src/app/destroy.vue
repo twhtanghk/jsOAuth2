@@ -21,17 +21,17 @@
 </template>
 
 <script lang='coffee'>
-{User} = require('../model').default
+{App} = require('../model').default
 
 export default
   methods:
     confirm: ->
-      User
-        .delete()
+      App
+        .delete data: id: @$route.params.id
         .then =>
-          @$router.push path: '/user/logout'
+          @$router.push path: '/app'
     cancel: ->
-      @$router.push path: '/user'
+      @$router.push path: '/app'
 </script>
 
 <style scoped>

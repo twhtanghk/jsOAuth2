@@ -20,6 +20,12 @@ Vue.component 'rest',
       @error
     ]
   methods:
+    format: (data) ->
+      if data.createdAt?
+        data.createdAt = new Date data.createdAt
+      if data.updatedAt?
+        data.updatedAt = new Date data.updatedAt
+      data
     fetch: (opts = {}) ->
       opts.url ?= @baseUrl
       for i in @mw
@@ -33,12 +39,6 @@ export default
       baseUrl:
         default: "user"
     methods:
-      format: (data) ->
-        if data.createdAt?
-          data.createdAt = new Date data.createdAt
-        if data.updatedAt?
-          data.updatedAt = new Date data.updatedAt
-        data
       me: ->
         @read data: id: 'me'
       register: (email, password) ->
@@ -64,7 +64,7 @@ export default
         @put url: "#{@baseUrl}/reset", data: {hash, password}
       passwd: (oldpass, newpass) ->
         @put url: "#{@baseUrl}/password", data: {oldpass, newpass}
-      destroy: ->
+      delete: ->
         @del url: "#{@baseUrl}/me"
   App: new Vue
     extends: Vue.component 'rest'
@@ -80,7 +80,7 @@ export default
           client: 'Client Crendentials'
     methods:
       format: (data) ->
-        _.extend super(data), authDesc: @authList[data.authType]
+        _.extend data, authDesc: @_authList[data.authType]
       authList: ->
         reducer = (result, desc, key) ->
           result.push

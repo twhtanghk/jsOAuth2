@@ -11,6 +11,7 @@ class App extends Model
     'clientSecret'
     'authType'
     'cbUrl'
+    'createdBy'
   ]
 
   constructor: ->

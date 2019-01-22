@@ -57,9 +57,12 @@ class Model
     {user} = ctx.session
     {id} = ctx.params
     try
-      app = @model.findOne {_id: id, createdBy: user._id}
+      app = await @model.findOne id
       if app?
-        await next()
+        if app.createdBy == user._id
+          await next()
+        else
+          ctx.status = 401
     catch err
       ctx.throw 500, err.toString()
  

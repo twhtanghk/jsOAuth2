@@ -47,6 +47,7 @@ export default
     edit: ->
       @$router.push path: "/app/edit/#{@$route.params.id}"
     destroy: ->
+      @$router.push path: "/app/delete/#{@$route.params.id}"
     required: rule.required
     url: rule.url
   created: ->

@@ -19,6 +19,7 @@ export default new VueRouter
     {path: '/app', component: require('./app/list').default}
     {path: '/app/:id', component: require('./app/read').default}
     {path: '/app/edit/:id', component: require('./app/edit').default}
+    {path: '/app/delete/:id', component: require('./app/destroy').default}
     {path: '*', redirect: '/user'}
   ]
 </script>

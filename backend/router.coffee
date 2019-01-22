@@ -22,3 +22,4 @@ module.exports = router
   .get '/app', isAuthenticated, app.find
   .get '/app/:id', isAuthenticated, app.isAuthorized, app.findOne
   .put '/app/:id', isAuthenticated, app.isAuthorized, app.update
+  .delete '/app/:id', isAuthenticated, app.isAuthorized, app.destroy

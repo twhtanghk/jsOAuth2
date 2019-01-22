@@ -49,7 +49,7 @@ export default
         App
           .create data: _.pick @, 'name', 'clientId', 'clientSecret', 'authType', 'cbUrl'
           .then =>
-            @$router.push path: '/app/list'
+            @$router.push path: '/app'
           .catch (err) =>
             if err.message == 'Unauthorized access'
               @$router.push '/user/login'
