@@ -1,4 +1,5 @@
 module.exports =
+  baseUrl: process.env.BASEURL
   port: parseInt(process.env.PORT) || 3000
   session:
     keys: process.env.KEYS?.split(',') || ['keep it secret']
@@ -21,4 +22,4 @@ module.exports =
         html: '<p>Thank your for joining. Plesae click the link below to complete the registration process for your account. This validation key will be accepted for 24 hours.</p><p>Confirm: <a href="<%=url%>"><%=url%></a></p><p>If you did not request an account, please ignore and delete this email.</p>'
       reset:
         subject: 'Verfiication code for your account password'
-        html: '<p>Please click the link below to reset your password.</p><p>Confirm: <a href="<%-url%>"><%=url%></a></p><p>If you are not the intended recipient, please ignore and delete this email.</p>'
+        html: '<p>Please click the link below to reset your password.</p><p>Confirm: <a href="<%=url%>"><%=url%></a></p><p>If you are not the intended recipient, please ignore and delete this email.</p>'

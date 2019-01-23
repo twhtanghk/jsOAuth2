@@ -4,6 +4,7 @@ Model = require './model'
 {compareSync, hashSync, genSaltSync} = require 'bcrypt'
 {createTransport} = require 'nodemailer'
 {isEmail} = require 'validator'
+{URL, URLSearchParams} = require 'url'
 
 class User extends Model
   name: 'user'
@@ -72,11 +73,14 @@ class User extends Model
   registerMail: (ctx, next) ->
     try
       transporter = createTransport cfg.email.opts
+      url = new URL cfg.baseUrl
+      url.search = new URLSearchParams hash: ctx.response.body.registerHash
+      url.hash = '/user/activate'
       data =
         from: cfg.email.from
         to: ctx.response.body.email
         subject: cfg.email.user.register.subject
-        html: _.template(cfg.email.user.register.html)(url: 'url')
+        html: _.template(cfg.email.user.register.html)(url: url.toString())
       await transporter.sendMail data
       await next()
     catch err
@@ -172,11 +176,14 @@ class User extends Model
   resetMail: (ctx, next) ->
     try
       transporter = createTransport cfg.email.opts
+      url = new URL cfg.baseUrl
+      url.search = new URLSearchParams hash: ctx.response.body.resetHash
+      url.hash = '/user/resetPass'
       data =
         from: cfg.email.from
         to: ctx.response.body.email
         subject: cfg.email.user.reset.subject
-        html: _.template(cfg.email.user.reset.html)(url: 'url')
+        html: _.template(cfg.email.user.reset.html)(url: url.toString())
       await transporter.sendMail data
       await next()
     catch err

@@ -37,7 +37,7 @@ export default
       if not @$v.$invalid
         User
           .register @email, @password
-          .then ->
+          .then =>
             @$router.push path: '/user/login'
             console.info 'You have successfully registered. Please open the notification email and follow the steps to activate your account accordingly'
           .catch (err) ->
