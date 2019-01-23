@@ -75,7 +75,7 @@ export default
         type: Object
         default: ->
           code: 'Authorization Code'
-          implicit: 'Implicit Grant'
+          token: 'Implicit Grant'
           password: 'Resource Owner Password'
           client: 'Client Crendentials'
     methods:

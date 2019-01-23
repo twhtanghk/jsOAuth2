@@ -34,7 +34,7 @@ export default
     name: ''
     clientId: generateHash length: 41
     clientSecret: generateHash length: 129
-    authType: 'implicit'
+    authType: 'token'
     cbUrl: ''
   validations:
     name: { required }
