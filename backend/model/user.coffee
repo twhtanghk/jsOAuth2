@@ -125,7 +125,8 @@ class User extends Model
 
   login: (ctx, next) ->
     try
-      {email, password} = ctx.request.body
+      {email, username, password} = ctx.request.body
+      email ?= username
       user = await @model.findOne {email}
       if user?
         if user.isActive 
@@ -157,7 +158,7 @@ class User extends Model
     if isEmail ctx.params.email
       await next()
     else
-      ctx.throw 500, error: 'invalid email'
+      ctx.throw 400, 'invalid email'
 
   reset: (ctx, next) ->
     try

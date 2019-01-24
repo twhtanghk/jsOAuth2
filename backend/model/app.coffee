@@ -63,11 +63,14 @@ class App extends Model
   clientAuth: (ctx, next) ->
     try
       {parse} = require 'basic-auth'
-      {name, pass} = parse ctx.request.header.Authorization
+      {name, pass} = parse ctx.request.header.authorization
       ctx.client = await @model.findOne {clientId: name, clientSecret: pass}
-      await next()
     catch err
       ctx.throw 500, err.toString()
+    if ctx.client?
+      await next()
+    else
+      ctx.throw 400, 'invalid_client'
 
 module.exports =
   new App()

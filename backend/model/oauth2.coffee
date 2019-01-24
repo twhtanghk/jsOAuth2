@@ -32,7 +32,7 @@ class OAuth2 extends Model
       clientId: client_id
       scope: scope
       createdBy: ctx.session.user._id
-    data.token = jwt.sign data, cfg.session.keys[0], _.pick(OAuth2, 'expiresIn')
+    data.token = jwt.sign data, cfg.session.keys[0], expiresIn: OAuth2.expiresIn
     data = await @model.insert data
     url = new URL ctx.client.cbUrl
     switch response_type
@@ -44,7 +44,7 @@ class OAuth2 extends Model
         search = new URLSearchParams 
           access_token: data.token
           token_type: 'bearer'
-          expiresIn
+          expiresIn: OAuth2.expiresIn
         url.hash = search.toString()
         ctx.response.redirect url.toString()
       else
@@ -56,10 +56,10 @@ class OAuth2 extends Model
     switch grant_type
       when 'password'
         data =
-          clientId: client_id
+          clientId: ctx.client.clientId
           scope: scope
           createdBy: ctx.session.user._id
-        data.token = jwt.sign data, cfg.session.keys[0], _.pick(OAuth2, expiresIn)
+        data.token = jwt.sign data, cfg.session.keys[0], expiresIn: OAuth2.expiresIn
         data = await @model.insert data
         ctx.response.body =
           access_token: data.token
@@ -69,7 +69,7 @@ class OAuth2 extends Model
         data =
           clientId: client_id
           scope: scope
-        data.token = jwt.sign data, cfg.session.keys[0], _.pick(OAuth2, expiresIn)
+        data.token = jwt.sign data, cfg.session.keys[0], expiresIn: OAuth2.expiresIn
         data = await @model.insert data
         ctx.response.body =
           access_token: data.token
@@ -78,9 +78,42 @@ class OAuth2 extends Model
       else
         ctx.throw 400, 'invalid_grant'
     
+  verify: (ctx, next) ->
+    debugger
+    token = ctx.request.header.authorization?.match(/^Bearer (.*)$/)?[1]
+    if token?
+      stage = [
+        {
+          $match:
+            token: 
+              $eq: token
+        }
+        {
+          $lookup:
+            from: 'user'
+            localField: 'createdBy'
+            foreignField: '_id'
+            as: 'createdBy'
+        }
+        {
+          $unwind: '$createdBy'
+        }
+        {
+          $limit: 1
+        }
+      ]
+      res = await @model.aggregate stage
+      if res[0]?
+        ctx.response.body = _.omit res[0]?.createdBy, 'password', 'registerHash', 'resetHash'
+      else
+        ctx.throw 401, 'invalid_grant'
+    else
+      ctx.throw 400, 'invalid_request'
+      
 module.exports =
   new OAuth2()
     .actions [
       'authorize'
       'token'
+      'verify'
     ]
