@@ -3,6 +3,7 @@ Model = require './model'
 cfg = require '../config'
 jwt = require 'jsonwebtoken'
 {URL, URLSearchParams} = require 'url'
+{ObjectId} = require 'mongodb'
 
 class OAuth2 extends Model
   name: 'oauth2'
@@ -31,7 +32,7 @@ class OAuth2 extends Model
     data =
       clientId: client_id
       scope: scope
-      createdBy: ctx.session.user._id
+      createdBy: new ObjectId ctx.session.user._id
     data.token = jwt.sign data, cfg.session.keys[0], expiresIn: OAuth2.expiresIn
     data = await @model.insert data
     url = new URL ctx.client.cbUrl
@@ -58,7 +59,7 @@ class OAuth2 extends Model
         data =
           clientId: ctx.client.clientId
           scope: scope
-          createdBy: ctx.session.user._id
+          createdBy: new ObjectId ctx.session.user._id
         data.token = jwt.sign data, cfg.session.keys[0], expiresIn: OAuth2.expiresIn
         data = await @model.insert data
         ctx.response.body =
