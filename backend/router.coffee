@@ -1,8 +1,8 @@
 Router = require 'koa-router'
 router = new Router()
 user = require './model/user'
-oauth2 = require './model/oauth2'
 app = require './model/app'
+oauth2 = require './model/oauth2'
 csrf = require './csrf'
 
 isAuthenticated = require './policy/isAuthenticated'

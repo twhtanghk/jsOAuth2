@@ -6,6 +6,7 @@ bodyParser = require 'koa-bodyparser'
 methodOverride = require 'koa-methodoverride'
 router = require './router'
 serve = require 'koa-static'
+cors = require '@koa/cors'
 Promise = require 'bluebird'
 
 app = new Koa()
@@ -18,6 +19,7 @@ module.exports = new Promise (resolve, reject) ->
     .use session {maxAge: cfg.expiredTime * 60000}, app
     .use bodyParser()
     .use methodOverride()
+    .use cors()
     .use router.routes()
     .use router.allowedMethods()
     .use serve 'dist'

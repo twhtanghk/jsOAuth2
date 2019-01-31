@@ -25,3 +25,12 @@ describe 'oauth2', ->
       .expect 200
       .then (res) ->
         console.log res.body
+
+  it 'cors token', ->
+    url = parse process.env.TOKENURL
+    req global.server
+      .options url.path
+      .set 'Origin', 'abc.com'
+      .set 'Access-Control-Request-Method', 'POST'
+      .then (res) ->
+        console.log res.headers

@@ -79,7 +79,6 @@ class OAuth2 extends Model
         ctx.throw 400, 'invalid_grant'
     
   verify: (ctx, next) ->
-    debugger
     token = ctx.request.header.authorization?.match(/^Bearer (.*)$/)?[1]
     if token?
       stage = [
