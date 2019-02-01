@@ -104,7 +104,10 @@ class OAuth2 extends Model
       ]
       res = await @model.aggregate stage
       if res[0]?
-        ctx.response.body = _.omit res[0]?.createdBy, 'password', 'registerHash', 'resetHash'
+        ctx.response.body =
+          user:
+            email: res[0]?.createdBy.email
+          scope: res[0]?.scope
       else
         ctx.throw 401, 'invalid_grant'
     else
