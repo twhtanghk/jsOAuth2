@@ -27,6 +27,8 @@
 {User} = require('../model').default
 {required, email, minLength} = require 'vuelidate/lib/validators'
 rule = require('../rule').default
+aurl = require 'url'
+{parse} = require 'url'
 
 export default
   data: ->
@@ -43,7 +45,11 @@ export default
           .login @email, @password
           .then (user) =>
             eventBus.$emit 'auth', user
-            @$router.push path: '/user'
+            {query} = parse window.location.toString(), true
+            if 'next' of query
+              window.location = decodeURIComponent query.next
+            else
+              @$router.push path: '/user'
           .catch (err) ->
             console.error err.toString()
     required: rule.required
