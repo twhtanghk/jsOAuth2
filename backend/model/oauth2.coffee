@@ -28,7 +28,9 @@ class OAuth2 extends Model
             $lt: new Date(Date.now() - cfg.expiredTime * 60000)
 
   authorize: (ctx, next) ->
-    {response_type, client_id, redirect_uri, scope} = ctx.request.query
+    {parse} = require 'query-string'
+    {response_type, client_id, redirect_uri, scope} = parse ctx.request.search, arrayFormat: 'bracket'
+    scope = scope?.join ' '
     data =
       clientId: client_id
       scope: scope
