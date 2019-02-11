@@ -30,7 +30,8 @@ class OAuth2 extends Model
   authorize: (ctx, next) ->
     {parse} = require 'query-string'
     {response_type, client_id, redirect_uri, scope} = parse ctx.request.search, arrayFormat: 'bracket'
-    scope = scope?.join ' '
+    if Array.isArray scope
+      scope = scope?.join ' '
     data =
       clientId: client_id
       scope: scope
