@@ -1,4 +1,4 @@
 module.exports = (ctx, next) ->
   ctx.request.body ?= {}
-  ctx.request.body.createdBy = ctx.req.user._id
+  ctx.request.body.createdBy = ctx.session.user._id
   await next()
