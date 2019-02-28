@@ -28,9 +28,11 @@ Vue.component 'rest',
       data
     fetch: (opts = {}) ->
       opts.url ?= @baseUrl
+      {req, res} = {}
+      req = opts
       for i in @mw
-        opts = await i opts
-      opts
+        {req, res} = await i {req, res}
+      res
   
 export default
   User: new Vue
