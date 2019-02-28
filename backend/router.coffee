@@ -6,6 +6,7 @@ oauth2 = require './model/oauth2'
 csrf = require './csrf'
 
 isAuthenticated = require './policy/isAuthenticated'
+setCreatedBy = require './policy/setCreatedBy'
 
 module.exports = router
   # user
@@ -23,7 +24,7 @@ module.exports = router
   .delete '/user/:id', csrf, isAuthenticated, user.isAuthorized, user.destroy, user.omitAttr
   # app
   .post '/app', csrf, isAuthenticated, app.create
-  .get '/app', csrf, isAuthenticated, app.find
+  .get '/app', csrf, isAuthenticated, setCreatedBy, app.find
   .get '/app/:id', csrf, isAuthenticated, app.isAuthorized, app.findOne
   .put '/app/:id', csrf, isAuthenticated, app.isAuthorized, app.update
   .delete '/app/:id', csrf, isAuthenticated, app.isAuthorized, app.destroy
